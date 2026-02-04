@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import SignIn from './pages/SignIn'
 import { SignUp } from './pages/SignUp'
@@ -9,7 +9,20 @@ import Purchase from './pages/Purchase'
 import Payment from './pages/Payment'
 import AdminDashboard from './pages/AdminDashboard'
 
-const App = () =>{
+function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Track visitor
+    fetch('http://localhost:5000/api/track-visitor', { method: 'POST' })
+      .catch(err => console.error('Error tracking visitor', err));
+
+    const token = localStorage.getItem("token");
+    if (token) {
+      // Decode or verify token if needed, or fetch user profile
+      // For now, let's assume we maintain session via localStorage
+    }
+  }, []);
     return(
         <Routes>
             <Route path='/' element={<Home/>} />

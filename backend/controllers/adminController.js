@@ -99,6 +99,13 @@ exports.getDashboardStats = async (req, res) => {
       sales: item.salesCount
     }));
 
+    // Total visitors
+    const siteStats = await require('../models/SiteStats').findOne();
+    const totalVisitors = siteStats ? siteStats.totalVisitors : 0;
+
+    // Most viewed artworks
+    const mostViewedArtworks = await Artwork.find({}).sort({ views: -1 }).limit(5).select('title views imageUrl');
+
     // Send response
     res.json({
       totalSellers,
@@ -106,14 +113,95 @@ exports.getDashboardStats = async (req, res) => {
       totalArtworks,
       totalSales,
       totalRevenue,
+      totalVisitors,
       topBuyer,
       salesByMonth: formattedSalesByMonth,
       artworksByCategory: formattedArtworksByCategory,
-      topSellingArtworks: formattedTopArtworks
+      topSellingArtworks: formattedTopArtworks,
+      mostViewedArtworks
     });
 
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
     res.status(500).json({ message: 'Failed to fetch dashboard statistics', error: error.message });
+  }
+};
+
+exports.getPendingArtworks = async (req, res) => {
+  try {
+    // Find artworks where status is Pending OR the field doesn't exist (for older records)
+    const artworks = await Artwork.find({
+      $or: [
+        { verificationStatus: 'Pending' },
+        { verificationStatus: { $exists: false } }
+      ]
+    }).populate('seller', 'fullName email');
+    res.json(artworks);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching pending artworks' });
+  }
+};
+
+exports.verifyArtwork = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body; // 'Approved' or 'Rejected'
+
+    if (!['Approved', 'Rejected'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status' });
+    }
+
+    const artwork = await Artwork.findByIdAndUpdate(id, { verificationStatus: status }, { new: true });
+    if (!artwork) return res.status(404).json({ message: 'Artwork not found' });
+
+    res.json({ message: `Artwork ${status}`, artwork });
+  } catch (error) {
+    res.status(500).json({ message: 'Error verifying artwork' });
+  }
+};
+
+// Get all sellers/artists with their artwork count
+exports.getAllSellers = async (req, res) => {
+  try {
+    const sellers = await User.find({ role: 'seller' }).select('-password');
+
+    // Get artwork count for each seller
+    const sellersWithArtworks = await Promise.all(
+      sellers.map(async (seller) => {
+        const artworks = await Artwork.find({ seller: seller._id });
+        return {
+          ...seller.toObject(),
+          artworkCount: artworks.length,
+          artworks: artworks
+        };
+      })
+    );
+
+    res.json(sellersWithArtworks);
+  } catch (error) {
+    console.error('Error fetching sellers:', error);
+    res.status(500).json({ message: 'Error fetching sellers' });
+  }
+};
+
+// Delete a seller and all their artworks
+exports.deleteSeller = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Delete all artworks by this seller
+    await Artwork.deleteMany({ seller: id });
+
+    // Delete the seller
+    const seller = await User.findByIdAndDelete(id);
+
+    if (!seller) {
+      return res.status(404).json({ message: 'Seller not found' });
+    }
+
+    res.json({ message: 'Seller and their artworks deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting seller:', error);
+    res.status(500).json({ message: 'Error deleting seller' });
   }
 };

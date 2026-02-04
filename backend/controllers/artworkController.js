@@ -2,7 +2,7 @@ const Artwork = require('../models/Artwork');
 
 const createArtwork = async (req, res) => {
   try {
-    const { title, description, price, label, status } = req.body;
+    const { title, description, price, label, status, paperQuality, brushType, strokeCount } = req.body;
 
     if (!req.file) return res.status(400).json({ message: 'Image file is required' });
 
@@ -11,7 +11,13 @@ const createArtwork = async (req, res) => {
       description,
       price,
       label,
-      status,
+      status, // 'Available' or 'Sold'
+      verificationStatus: 'Pending',
+      details: {
+        paperQuality,
+        brushType,
+        strokeCount
+      },
       imageUrl: `/uploads/${req.file.filename}`,
       seller: req.user._id,
     });
@@ -60,7 +66,8 @@ const updateArtwork = async (req, res) => {
 };
 const getAllArtworksPublic = async (req, res) => {
   try {
-    const artworks = await Artwork.find({}); // Optionally filter e.g., { status: "public" }
+    // Only return artworks that are Approved (and optionally filtered by status)
+    const artworks = await Artwork.find({ verificationStatus: 'Approved' });
     res.json(artworks);
   } catch (err) {
     res.status(500).json({ message: 'Server error while fetching artworks' });
@@ -71,6 +78,11 @@ const getArtworkById = async (req, res) => {
   try {
     const artwork = await Artwork.findById(req.params.id).populate('seller', 'fullName username');
     if (!artwork) return res.status(404).json({ message: 'Artwork not found' });
+
+    // Increment views
+    artwork.views = (artwork.views || 0) + 1;
+    await artwork.save();
+
     res.json(artwork);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });

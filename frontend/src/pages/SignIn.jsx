@@ -106,7 +106,7 @@ export const SignIn = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -40, scale: 0.95 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="bg-white/10 backdrop-blur-xl p-10 rounded-3xl border border-white/30 shadow-2xl w-full max-w-md z-10"
+            className="bg-white/10 backdrop-blur-xl p-6 md:p-10 rounded-3xl border border-white/30 shadow-2xl w-full max-w-md z-10"
           >
             <motion.h2
               className="text-white text-3xl font-extrabold text-center mb-6"

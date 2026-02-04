@@ -105,6 +105,12 @@ const Home = () => {
     return () => ctx.revert();
   }, []);
 
+  useEffect(() => {
+    // Track page visitor
+    fetch('http://localhost:5000/api/track-visitor', { method: 'POST' })
+      .catch(err => console.error('Error tracking visitor', err));
+  }, []);
+
   return (
     <div className="relative">
       {!isLoaded && (
@@ -123,18 +129,18 @@ const Home = () => {
             "url(https://images.unsplash.com/photo-1577084381314-cae9920e6871?q=80&w=1704&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
         }}
       >
-        <nav className="flex items-center justify-between px-6 py-4 bg-black/40 backdrop-blur-sm z-50 text-white shadow-md">
-          <div className="text-3xl font-bold tracking-wide">🎨 Musemarket</div>
-          <div className="space-x-4">
+        <nav className="flex flex-wrap items-center justify-between px-4 md:px-6 py-4 bg-black/40 backdrop-blur-sm z-50 text-white shadow-md">
+          <div className="text-2xl md:text-3xl font-bold tracking-wide">🎨 Musemarket</div>
+          <div className="space-x-4 mt-2 md:mt-0">
             <Link
               to="/signin"
-              className="px-4 py-2 bg-white text-black rounded hover:bg-gray-200 transition"
+              className="px-3 py-1.5 md:px-4 md:py-2 bg-white text-black rounded hover:bg-gray-200 transition text-sm md:text-base"
             >
               Login
             </Link>
             <Link
               to="/signup"
-              className="px-4 py-2 border border-white rounded hover:bg-white hover:text-black transition"
+              className="px-3 py-1.5 md:px-4 md:py-2 border border-white rounded hover:bg-white hover:text-black transition text-sm md:text-base"
             >
               Sign Up
             </Link>
@@ -143,9 +149,9 @@ const Home = () => {
 
         <section
           ref={heroRef}
-          className="flex flex-col items-center justify-center px-6 text-center py-28 backdrop-blur-sm text-white"
+          className="flex flex-col items-center justify-center px-4 md:px-6 text-center py-20 md:py-28 backdrop-blur-sm text-white"
         >
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
             Discover & Own Timeless Art
           </h1>
           <p className="max-w-2xl text-lg md:text-xl mb-4">

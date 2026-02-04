@@ -79,16 +79,26 @@ const Purchase = () => {
         className="bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden flex flex-col md:flex-row"
       >
         {/* Artwork Preview Section */}
-        <div className="md:w-1/2 relative">
+        <div className="md:w-1/2 relative h-64 md:h-auto">
           <img
             src={`http://localhost:5000${artwork.imageUrl}`}
             alt={artwork.title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-6">
+          <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 to-transparent p-6">
             <h2 className="text-3xl font-bold">{artwork.title}</h2>
-            <p className="text-gray-300 mt-2">{artwork.description}</p>
-            <p className="text-2xl font-semibold text-purple-400 mt-2">Rs. {artwork.price}</p>
+            <p className="text-gray-300 mt-2 line-clamp-2">{artwork.description}</p>
+
+            {/* Artwork Details */}
+            {artwork.details && (
+              <div className="mt-3 text-sm text-gray-300 space-y-1">
+                {artwork.details.paperQuality && <p><span className="text-gray-400">Paper:</span> {artwork.details.paperQuality}</p>}
+                {artwork.details.brushType && <p><span className="text-gray-400">Brush:</span> {artwork.details.brushType}</p>}
+                {artwork.details.strokeCount && <p><span className="text-gray-400">Details:</span> {artwork.details.strokeCount}</p>}
+              </div>
+            )}
+
+            <p className="text-2xl font-semibold text-purple-400 mt-4">Rs. {artwork.price}</p>
           </div>
         </div>
 

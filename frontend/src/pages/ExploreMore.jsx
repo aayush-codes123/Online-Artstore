@@ -78,6 +78,12 @@ const ExploreMore = () => {
   }, []);
 
   useEffect(() => {
+    // Track page visitor
+    fetch('http://localhost:5000/api/track-visitor', { method: 'POST' })
+      .catch(err => console.error('Error tracking visitor', err));
+  }, []);
+
+  useEffect(() => {
     if (selectedArt) {
       gsap.fromTo(
         modalRef.current,

@@ -47,7 +47,21 @@ const UploadArtwork = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    Object.entries(artwork).forEach(([key, val]) => formData.append(key, val));
+
+    // Calculate final price with 5% commission
+    const basePrice = parseFloat(artwork.price);
+    const finalPrice = basePrice * 1.05;
+
+    // Append all fields
+    formData.append('title', artwork.title);
+    formData.append('description', artwork.description);
+    formData.append('price', finalPrice); // Send final price
+    formData.append('label', artwork.label);
+    formData.append('status', artwork.status);
+    formData.append('paperQuality', artwork.paperQuality || '');
+    formData.append('brushType', artwork.brushType || '');
+    formData.append('strokeCount', artwork.strokeCount || '');
+    if (artwork.image) formData.append('image', artwork.image);
 
     try {
       const res = await fetch("http://localhost:5000/api/seller/artworks", {
@@ -84,7 +98,7 @@ const UploadArtwork = () => {
 
   return (
     <motion.div
-      className="bg-white/10 backdrop-blur-lg p-8 rounded-3xl border border-white/30 shadow-2xl max-w-3xl mx-auto"
+      className="bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-3xl border border-white/30 shadow-2xl max-w-3xl mx-auto"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -139,7 +153,29 @@ const UploadArtwork = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-white/90 font-medium mb-2">Price (Rs.)</label>
+            <label className="block text-white/90 font-medium mb-2">Paper Quality</label>
+            <input type="text" name="paperQuality" value={artwork.paperQuality} onChange={handleChange}
+              className="w-full p-3 rounded-lg bg-white/20 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-purple-500 transition"
+              placeholder="e.g. 300gsm Cold Press" />
+          </div>
+          <div>
+             <label className="block text-white/90 font-medium mb-2">Brush Type</label>
+             <input type="text" name="brushType" value={artwork.brushType} onChange={handleChange}
+               className="w-full p-3 rounded-lg bg-white/20 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-purple-500 transition"
+               placeholder="e.g. Synthetic, Sable" />
+          </div>
+        </div>
+
+        <div>
+             <label className="block text-white/90 font-medium mb-2">Stroke Count / Details</label>
+             <input type="text" name="strokeCount" value={artwork.strokeCount} onChange={handleChange}
+               className="w-full p-3 rounded-lg bg-white/20 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-purple-500 transition"
+               placeholder="Specific strokes or technique details" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-white/90 font-medium mb-2">Your Price (Rs.)</label>
             <input
               type="number"
               name="price"
@@ -150,6 +186,12 @@ const UploadArtwork = () => {
               className="w-full p-3 rounded-lg bg-white/20 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-purple-500 transition"
               placeholder="Enter price"
             />
+            {artwork.price && (
+                <div className="mt-2 text-sm text-gray-300">
+                    <p>Commission (5%): Rs. {(artwork.price * 0.05).toFixed(2)}</p>
+                    <p className="font-bold text-white">Listing Price: Rs. {(artwork.price * 1.05).toFixed(2)}</p>
+                </div>
+            )}
           </div>
           <div>
             <label className="block text-white/90 font-medium mb-2">Status</label>

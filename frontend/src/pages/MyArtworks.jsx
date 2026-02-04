@@ -89,7 +89,7 @@ const MyArtworks = () => {
 
   return (
     <motion.div
-      className="bg-white/10 backdrop-blur-lg p-8 rounded-3xl border border-white/30 shadow-2xl max-w-6xl mx-auto"
+      className="bg-white/10 backdrop-blur-lg p-6 md:p-8 rounded-3xl border border-white/30 shadow-2xl max-w-6xl mx-auto"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -215,6 +215,18 @@ const MyArtworks = () => {
                         {art.status}
                       </span>
                     </div>
+
+                    {/* Verification Status Badge */}
+                    <div className="mb-2">
+                        <span className={`px-2 py-0.5 rounded text-xs border ${
+                            art.verificationStatus === 'Approved' ? 'border-green-500 text-green-300' :
+                            art.verificationStatus === 'Rejected' ? 'border-red-500 text-red-300' :
+                            'border-yellow-500 text-yellow-300'
+                        }`}>
+                            Approval: {art.verificationStatus || 'Pending'}
+                        </span>
+                    </div>
+
                     {art.label && (
                       <p className="text-white/50 text-xs mb-3">Category: {art.label}</p>
                     )}

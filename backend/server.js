@@ -30,6 +30,7 @@ app.use('/api/seller', sellerRoutes);
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.post('/api/track-visitor', require('./controllers/statsController').trackVisitor);
 
 const PORT = process.env.PORT || 5000;
 
