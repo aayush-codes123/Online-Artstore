@@ -303,7 +303,7 @@ const Home = () => {
               to="signup"
               className="px-6 py-3 bg-white text-black font-semibold rounded hover:bg-gray-300 transition"
             >
-              Become a Seller
+              Become a Seller 
             </Link>
           </div>
         </section>
