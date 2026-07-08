@@ -12,12 +12,47 @@ const createAdminUser = require('./utils/createAdminUser');
 dotenv.config();
 
 const app = express();
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:5173",  // ✅ your frontend URL
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or same-origin fetch)
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true                 // ✅ allow cookies / tokens to be sent
   })
 );
+
+// Database connection initialization flag
+let dbInitialized = false;
+
+const initApp = async () => {
+  if (!dbInitialized) {
+    await connectDB();
+    await createAdminUser();
+    dbInitialized = true;
+  }
+};
+
+// Middleware to ensure database is initialized on demand (critical for Vercel Serverless Functions)
+app.use(async (req, res, next) => {
+  try {
+    await initApp();
+    next();
+  } catch (error) {
+    console.error('Database initialization failed:', error);
+    res.status(500).json({ error: 'Server database initialization failed' });
+  }
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,14 +69,13 @@ app.post('/api/track-visitor', require('./controllers/statsController').trackVis
 
 const PORT = process.env.PORT || 5000;
 
-// Start server after database connection and admin user creation
-(async () => {
-  try {
-    await connectDB();
-    await createAdminUser();
+// Only listen when running locally in development (not under Vercel Serverless)
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  initApp().then(() => {
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
-  }
-})();
+  }).catch((err) => {
+    console.error('Failed to start local server:', err);
+  });
+}
+
+module.exports = app;

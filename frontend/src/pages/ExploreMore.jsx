@@ -50,7 +50,7 @@ const ExploreMore = () => {
 
   useEffect(() => {
     // Fetch artworks from backend
-    fetch("http://localhost:5000/api/artworks/explore")
+    fetch("/api/artworks/explore")
       .then((res) => res.json())
       .then((data) => {
         setArtworks(data);
@@ -62,7 +62,7 @@ const ExploreMore = () => {
     if (token) {
       // Example: decode token or call backend to get username
       // Here, assuming backend provides a user info endpoint
-      fetch("http://localhost:5000/api/auth/profile", {
+      fetch("/api/auth/profile", {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => {
@@ -79,7 +79,7 @@ const ExploreMore = () => {
 
   useEffect(() => {
     // Track page visitor
-    fetch('http://localhost:5000/api/track-visitor', { method: 'POST' })
+    fetch('/api/track-visitor', { method: 'POST' })
       .catch(err => console.error('Error tracking visitor', err));
   }, []);
 
@@ -126,7 +126,7 @@ const ExploreMore = () => {
             onClick={() => setSelectedArt(art)}
           >
             <img
-              src={`http://localhost:5000${art.imageUrl}`}
+              src={art.imageUrl}
               alt={art.title}
               className="w-full h-48 object-cover"
               loading="lazy"
@@ -165,7 +165,7 @@ const ExploreMore = () => {
               &times;
             </button>
             <img
-              src={`http://localhost:5000${selectedArt.imageUrl}`}
+              src={selectedArt.imageUrl}
               alt={selectedArt.title}
               className="w-full h-64 object-cover rounded-t-xl"
             />

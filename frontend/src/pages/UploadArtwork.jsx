@@ -19,7 +19,7 @@ const UploadArtwork = () => {
   useEffect(() => {
     const fetchSellerInfo = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/auth/profile", {
+        const res = await fetch("/api/auth/profile", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -64,7 +64,7 @@ const UploadArtwork = () => {
     if (artwork.image) formData.append('image', artwork.image);
 
     try {
-      const res = await fetch("http://localhost:5000/api/seller/artworks", {
+      const res = await fetch("/api/seller/artworks", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

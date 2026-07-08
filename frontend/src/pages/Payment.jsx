@@ -27,7 +27,7 @@ const CheckoutForm = ({ artwork, formData, onSuccess }) => {
       const token = localStorage.getItem("token");
 
       // Create PaymentIntent on the server
-      const response = await fetch("http://localhost:5000/api/payment/create-payment-intent", {
+      const response = await fetch("/api/payment/create-payment-intent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +55,7 @@ const CheckoutForm = ({ artwork, formData, onSuccess }) => {
 
       if (paymentIntent.status === "succeeded") {
         // Payment successful, now create the order
-        const orderRes = await fetch("http://localhost:5000/api/orders", {
+        const orderRes = await fetch("/api/orders", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

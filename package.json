@@ -1,5 +1,12 @@
 {
+  "name": "artstore",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm run build-backend && npm run build-frontend",
+    "build-backend": "cd backend && npm install",
+    "build-frontend": "cd frontend && npm install && npm run build"
+  },
   "dependencies": {
-    "framer-motion": "^7.10.3"
+    "framer-motion": "^12.42.2"
   }
 }

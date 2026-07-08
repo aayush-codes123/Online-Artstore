@@ -95,7 +95,7 @@ const Home = () => {
     });
 
     // Fetch artworks from backend
-    fetch("http://localhost:5000/api/artworks/explore")
+    fetch("/api/artworks/explore")
       .then((res) => res.json())
       .then((data) => {
         setArtworks(data.slice(0, 6)); // Show top 6 featured artworks
@@ -107,7 +107,7 @@ const Home = () => {
 
   useEffect(() => {
     // Track page visitor
-    fetch('http://localhost:5000/api/track-visitor', { method: 'POST' })
+    fetch('/api/track-visitor', { method: 'POST' })
       .catch(err => console.error('Error tracking visitor', err));
   }, []);
 
@@ -181,7 +181,7 @@ const Home = () => {
                   className="rounded-lg overflow-hidden bg-white shadow-xl hover:shadow-2xl transition transform hover:scale-105"
                 >
                   <img
-                    src={`http://localhost:5000${encodeURI(art.imageUrl)}`}
+                    src={encodeURI(art.imageUrl)}
                     alt={art.title}
                     className="w-full h-64 object-cover"
                   />

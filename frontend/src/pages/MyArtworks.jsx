@@ -16,7 +16,7 @@ const MyArtworks = () => {
 
   const fetchArtworks = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/seller/artworks", {
+      const res = await fetch("/api/seller/artworks", {
         credentials: "include",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -34,7 +34,7 @@ const MyArtworks = () => {
     if (!window.confirm("Are you sure you want to delete this artwork?")) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/seller/artworks/${id}`, {
+      const res = await fetch(`/api/seller/artworks/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -64,7 +64,7 @@ const MyArtworks = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch(`http://localhost:5000/api/seller/artworks/${editForm._id}`, {
+      const res = await fetch(`/api/seller/artworks/${editForm._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -198,7 +198,7 @@ const MyArtworks = () => {
               ) : (
                 <>
                   <img
-                    src={`http://localhost:5000${art.imageUrl}`}
+                    src={art.imageUrl}
                     alt={art.title}
                     className="w-full h-48 object-cover"
                   />

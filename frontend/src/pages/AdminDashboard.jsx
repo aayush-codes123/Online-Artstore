@@ -197,7 +197,7 @@ const ArtworkVerification = () => {
   const fetchPending = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:5000/api/admin/pending-artworks', {
+      const res = await fetch('/api/admin/pending-artworks', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) setPending(await res.json());
@@ -209,7 +209,7 @@ const ArtworkVerification = () => {
   const handleVerify = async (id, status) => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/verify-artwork/${id}`, {
+      const res = await fetch(`/api/admin/verify-artwork/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -249,7 +249,7 @@ const ArtworkVerification = () => {
                 <tr key={art._id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="p-3">
                     <img
-                      src={`http://localhost:5000${art.imageUrl}`}
+                      src={art.imageUrl}
                       className="h-12 w-12 object-cover rounded-lg shadow-sm"
                       alt={art.title}
                     />
@@ -299,7 +299,7 @@ const ArtistsManagement = () => {
   const fetchSellers = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:5000/api/admin/sellers', {
+      const res = await fetch('/api/admin/sellers', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) setSellers(await res.json());
@@ -313,7 +313,7 @@ const ArtistsManagement = () => {
 
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/sellers/${id}`, {
+      const res = await fetch(`/api/admin/sellers/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -391,7 +391,7 @@ const ArtistsManagement = () => {
             {selectedSeller.artworks.map((art) => (
               <div key={art._id} className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition">
                 <img
-                  src={`http://localhost:5000${art.imageUrl}`}
+                  src={art.imageUrl}
                   alt={art.title}
                   className="w-full h-32 object-cover"
                 />
@@ -432,7 +432,7 @@ const AdminDashboard = () => {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/api/admin/dashboard-stats", {
+        const res = await fetch("/api/admin/dashboard-stats", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -657,7 +657,7 @@ const AdminDashboard = () => {
                   {stats.mostViewedArtworks && stats.mostViewedArtworks.map((art) => (
                     <div key={art._id} className="bg-gray-50 p-4 rounded-xl hover:shadow-md transition border border-gray-200">
                       <img
-                        src={`http://localhost:5000${art.imageUrl}`}
+                        src={art.imageUrl}
                         alt={art.title}
                         className="h-32 w-full object-cover rounded-lg mb-2 shadow-sm"
                       />

@@ -13,7 +13,7 @@
     "@stripe/react-stripe-js": "^5.4.1",
     "@stripe/stripe-js": "^8.5.3",
     "@tailwindcss/vite": "^4.0.15",
-    "framer-motion": "^7.10.3",
+    "framer-motion": "^12.42.2",
     "gsap": "^3.13.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -15,7 +15,7 @@ export const SignIn = () => {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/signin", {
+      const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // for cookies if using sessions

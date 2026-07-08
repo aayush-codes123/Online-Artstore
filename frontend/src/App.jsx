@@ -14,7 +14,7 @@ function App() {
 
   useEffect(() => {
     // Track visitor
-    fetch('http://localhost:5000/api/track-visitor', { method: 'POST' })
+    fetch('/api/track-visitor', { method: 'POST' })
       .catch(err => console.error('Error tracking visitor', err));
 
     const token = localStorage.getItem("token");

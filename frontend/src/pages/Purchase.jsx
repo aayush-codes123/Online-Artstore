@@ -25,13 +25,13 @@ const Purchase = () => {
         }
 
         // Fetch Artwork Details
-        const artRes = await fetch(`http://localhost:5000/api/artworks/${artworkId}`);
+        const artRes = await fetch(`/api/artworks/${artworkId}`);
         if (!artRes.ok) throw new Error("Failed to load artwork");
         const artData = await artRes.json();
         setArtwork(artData);
 
         // Fetch User Profile for Pre-filling
-        const userRes = await fetch("http://localhost:5000/api/auth/profile", {
+        const userRes = await fetch("/api/auth/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (userRes.ok) {
@@ -81,7 +81,7 @@ const Purchase = () => {
         {/* Artwork Preview Section */}
         <div className="md:w-1/2 relative h-64 md:h-auto">
           <img
-            src={`http://localhost:5000${artwork.imageUrl}`}
+            src={artwork.imageUrl}
             alt={artwork.title}
             className="w-full h-full object-cover"
           />
