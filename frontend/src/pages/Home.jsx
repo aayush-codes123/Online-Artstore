@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,34 +29,44 @@ const Home = () => {
         ease: "power2.out",
       });
 
-      gsap.from("nav", {
-        y: -60,
-        opacity: 0,
-        duration: 1.2,
-        ease: "power2.out",
-        delay: 2,
-      });
+      gsap.fromTo("nav",
+        { y: -60, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.2,
+          ease: "power2.out",
+          delay: 2,
+        }
+      );
 
-      gsap.from(heroRef.current, {
-        y: 50,
-        opacity: 0,
-        duration: 1.4,
-        ease: "power3.out",
-        delay: 2.2,
-      });
+      gsap.fromTo(heroRef.current,
+        { y: 50, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.4,
+          ease: "power3.out",
+          delay: 2.2,
+        }
+      );
 
       cardsRef.current.slice(0, 3).forEach((card, index) => {
-        gsap.from(card, {
-          scrollTrigger: {
-            trigger: card,
-            start: "top 85%",
-          },
-          opacity: 0,
-          y: 60,
-          duration: 1,
-          delay: index * 0.2,
-          ease: "power3.out",
-        });
+        if (!card) return;
+        gsap.fromTo(card,
+          { opacity: 0, y: 60 },
+          {
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+            },
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            delay: index * 0.2,
+            ease: "power3.out",
+          }
+        );
       });
 
       [3, 4].forEach((i) => {
@@ -82,16 +93,19 @@ const Home = () => {
         );
       });
 
-      gsap.from(ctaRef.current, {
-        scrollTrigger: {
-          trigger: ctaRef.current,
-          start: "top 85%",
-        },
-        opacity: 0,
-        y: 100,
-        duration: 1.5,
-        ease: "power4.out",
-      });
+      gsap.fromTo(ctaRef.current,
+        { opacity: 0, y: 100 },
+        {
+          scrollTrigger: {
+            trigger: ctaRef.current,
+            start: "top 85%",
+          },
+          opacity: 1,
+          y: 0,
+          duration: 1.5,
+          ease: "power4.out",
+        }
+      );
     });
 
     // Fetch artworks from backend
@@ -129,27 +143,11 @@ const Home = () => {
             "url(https://images.unsplash.com/photo-1577084381314-cae9920e6871?q=80&w=1704&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)",
         }}
       >
-        <nav className="flex flex-wrap items-center justify-between px-4 md:px-6 py-4 bg-black/40 backdrop-blur-sm z-50 text-white shadow-md">
-          <div className="text-2xl md:text-3xl font-bold tracking-wide">🎨 Musemarket</div>
-          <div className="space-x-4 mt-2 md:mt-0">
-            <Link
-              to="/signin"
-              className="px-3 py-1.5 md:px-4 md:py-2 bg-white text-black rounded hover:bg-gray-200 transition text-sm md:text-base"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="px-3 py-1.5 md:px-4 md:py-2 border border-white rounded hover:bg-white hover:text-black transition text-sm md:text-base"
-            >
-              Sign Up
-            </Link>
-          </div>
-        </nav>
+        <Navbar />
 
         <section
           ref={heroRef}
-          className="flex flex-col items-center justify-center px-4 md:px-6 text-center py-20 md:py-28 backdrop-blur-sm text-white"
+          className="flex flex-col items-center justify-center px-4 md:px-6 text-center pt-28 pb-20 md:pt-40 md:pb-28 backdrop-blur-sm text-white"
         >
           <h1 className="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
             Discover & Own Timeless Art

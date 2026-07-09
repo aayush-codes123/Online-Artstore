@@ -1,45 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import gsap from "gsap";
 import { useNavigate } from "react-router-dom";
-
-const Navbar = ({ userName }) => (
-  <nav className="flex items-center justify-between px-6 py-4 bg-black bg-opacity-80 text-white shadow-md fixed w-full top-0 z-50">
-    <div className="flex items-center space-x-4">
-      <div className="text-3xl font-bold tracking-wide">Musemarket</div>
-      {userName && (
-        <div className="text-lg font-semibold ml-6">Welcome, {userName}</div>
-      )}
-    </div>
-    <div className="space-x-4">
-      {!userName ? (
-        <>
-          <button
-            onClick={() => (window.location.href = "/signin")}
-            className="px-4 py-2 bg-white text-black rounded hover:bg-gray-200 transition"
-          >
-            Login
-          </button>
-          <button
-            onClick={() => (window.location.href = "/signup")}
-            className="px-4 py-2 border border-white rounded hover:bg-white hover:text-black transition"
-          >
-            Sign Up
-          </button>
-        </>
-      ) : (
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            window.location.href = "/signin";
-          }}
-          className="px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition"
-        >
-          Logout
-        </button>
-      )}
-    </div>
-  </nav>
-);
+import Navbar from "../components/Navbar";
 
 const ExploreMore = () => {
   const [artworks, setArtworks] = useState([]);
@@ -113,8 +75,8 @@ const ExploreMore = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-20 pb-12 px-0">
-      <Navbar userName={userName} />
+    <div className="min-h-screen bg-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+      <Navbar />
 
       <h1 className="text-4xl font-bold text-center mb-12">Explore More Artworks</h1>
 
