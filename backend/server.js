@@ -9,6 +9,7 @@ const authMiddleware = require('./middleware/authMiddleware');
 const authController = require('./controllers/authController');
 const createAdminUser = require('./utils/createAdminUser');
 
+dotenv.config({ path: path.join(__dirname, '.env') });
 dotenv.config();
 
 const app = express();
@@ -62,6 +63,8 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use('/api/seller/artworks', artworkRoutes);
 app.use('/api/artworks', artworkRoutes);
 app.use('/api/seller', sellerRoutes);
+app.use('/api/cloudinary', require('./routes/cloudinaryRoutes'));
+app.use('/api/upload', require('./routes/cloudinaryRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));

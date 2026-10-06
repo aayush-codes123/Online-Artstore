@@ -65,7 +65,7 @@ const LogoutIcon = () => (
 );
 
 // Stat Card Component
-const StatCard = ({ title, value, change, icon: Icon, gradient }) => (
+const StatCard = ({ title, value, change, icon: Icon, badgeStyle }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -74,7 +74,7 @@ const StatCard = ({ title, value, change, icon: Icon, gradient }) => (
     <div className="flex items-start justify-between">
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-2">
-          <div className={`p-2.5 rounded-xl ${gradient} text-white`}>
+          <div className={`p-2.5 rounded-xl ${badgeStyle}`}>
             <Icon />
           </div>
         </div>
@@ -128,7 +128,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout, isMobileOpen, setIsMobileO
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md">
+              <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-200 flex items-center justify-center text-amber-500 font-bold text-lg shadow-sm">
                 A
               </div>
               <div>
@@ -545,28 +545,28 @@ const AdminDashboard = () => {
                   value={`Rs. ${stats.totalRevenue.toLocaleString()}`}
                   change={12.5}
                   icon={DollarIcon}
-                  gradient="bg-gradient-to-br from-green-500 to-emerald-600"
+                  badgeStyle="bg-emerald-100 text-emerald-700"
                 />
                 <StatCard
                   title="TOTAL VISITORS"
                   value={stats.totalVisitors.toLocaleString()}
                   change={5.2}
                   icon={EyeIcon}
-                  gradient="bg-gradient-to-br from-blue-500 to-cyan-600"
+                  badgeStyle="bg-blue-100 text-blue-700"
                 />
                 <StatCard
                   title="TOTAL ARTISTS"
                   value={stats.totalSellers.toLocaleString()}
                   change={8.1}
                   icon={UsersIcon}
-                  gradient="bg-gradient-to-br from-purple-500 to-pink-600"
+                  badgeStyle="bg-zinc-800 text-amber-300"
                 />
                 <StatCard
                   title="TOTAL ARTWORKS"
                   value={stats.totalArtworks.toLocaleString()}
                   change={15.3}
                   icon={ImageIcon}
-                  gradient="bg-gradient-to-br from-orange-500 to-red-600"
+                  badgeStyle="bg-amber-100 text-amber-700"
                 />
               </div>
 

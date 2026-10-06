@@ -1,3 +1,33 @@
-# backend/.env 
-backend/.env 
-.env 
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment files
+.env
+.env.*
+*.env
+backend/.env
+frontend/.env
+!*.env.example
+
+# Build outputs
+dist/
+dist-ssr/
+frontend/dist/
+build/
+.vercel
+
+# Uploads and temporary files
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# System
+.DS_Store
+Thumbs.db

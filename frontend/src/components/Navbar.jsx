@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Sparkles, 
+  Compass, 
+  Home as HomeIcon, 
+  Upload, 
+  ShieldCheck, 
+  LogOut, 
+  User, 
+  Menu, 
+  X,
+  Palette
+} from "lucide-react";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -38,192 +50,240 @@ const Navbar = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 40 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.45, ease: "easeOut" }}
-      className="fixed left-1/2 top-3 z-50 w-[calc(100%-1rem)] max-w-7xl -translate-x-1/2 sm:top-4 sm:w-[92%]"
+    <motion.header
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="fixed left-1/2 top-4 z-50 w-[calc(100%-1.5rem)] max-w-7xl -translate-x-1/2 sm:top-5 sm:w-[94%]"
     >
-      <nav className="relative overflow-hidden rounded-[1.35rem] border border-white/20 bg-slate-950/45 px-3 py-3 text-white shadow-[0_16px_60px_rgba(2,6,23,0.42)] backdrop-blur-2xl backdrop-saturate-150 sm:px-5 lg:px-6">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.16),_transparent_34%),radial-gradient(circle_at_bottom_right,_rgba(148,163,184,0.16),_transparent_32%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.10),transparent_45%,rgba(255,255,255,0.08))]" />
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.35),transparent_25%,transparent_75%,rgba(2,6,23,0.25))]" />
-
-        <div className="relative flex items-center justify-between gap-3">
+      <nav className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#0e1017]/85 px-4 py-3 text-white shadow-2xl shadow-black/60 backdrop-blur-xl sm:px-6">
+        <div className="relative flex items-center justify-between gap-4">
+          
+          {/* Logo */}
           <Link
             to="/"
-            className="flex items-center gap-2 transition-transform duration-200 hover:scale-[1.02]"
+            className="flex items-center gap-2.5 group transition-transform duration-200"
           >
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 text-xl shadow-lg shadow-black/10 ring-1 ring-white/20">
-              🎨
-            </span>
-            <span className="text-lg font-semibold tracking-[0.18em] text-white sm:text-xl">
-              MUSEMARKET
-            </span>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-800/90 border border-white/15 text-amber-300 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:border-amber-300/40">
+              <Palette className="w-5 h-5" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-base font-bold tracking-[0.2em] text-white font-serif-title sm:text-lg">
+                MUSEMARKET
+              </span>
+              <span className="text-[10px] tracking-[0.25em] text-zinc-400 uppercase -mt-1 font-sans">
+                Fine Art & Archive
+              </span>
+            </div>
           </Link>
 
-          <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-slate-950/20 px-2 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-xl md:flex">
+          {/* Desktop Navigation Links */}
+          <div className="hidden items-center gap-1.5 rounded-full border border-white/10 bg-zinc-900/60 p-1.5 backdrop-blur-lg md:flex">
             <Link
               to="/"
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                isActive("/") ? "bg-white text-slate-900 shadow-sm" : "text-white hover:bg-white/10 hover:text-white"
+              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                isActive("/")
+                  ? "bg-white text-zinc-950 shadow-md font-semibold"
+                  : "text-zinc-300 hover:text-white hover:bg-white/10"
               }`}
             >
-              Home
+              <HomeIcon className="w-4 h-4 opacity-80" />
+              <span>Gallery</span>
             </Link>
+            
             <Link
               to="/explore"
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                isActive("/explore") ? "bg-white text-slate-900 shadow-sm" : "text-white hover:bg-white/10 hover:text-white"
+              className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                isActive("/explore")
+                  ? "bg-white text-zinc-950 shadow-md font-semibold"
+                  : "text-zinc-300 hover:text-white hover:bg-white/10"
               }`}
             >
-              Explore
+              <Compass className="w-4 h-4 opacity-80" />
+              <span>Explore Works</span>
             </Link>
+
             {user && (
               <Link
-                to={user.role === "seller" ? "/sellerdashboard" : user.role === "admin" ? "/admindashboard" : "/explore"}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                to={
+                  user.role === "seller"
+                    ? "/sellerdashboard"
+                    : user.role === "admin"
+                    ? "/admindashboard"
+                    : "/explore"
+                }
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
                   isActive("/sellerdashboard") || isActive("/admindashboard")
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "text-white hover:bg-white/15 hover:text-white"
+                    ? "bg-white text-zinc-950 shadow-md font-semibold"
+                    : "text-zinc-300 hover:text-white hover:bg-white/10"
                 }`}
               >
-                {user.role === "seller" ? "Seller Dashboard" : user.role === "admin" ? "Admin Dashboard" : ""}
+                {user.role === "seller" ? (
+                  <>
+                    <Upload className="w-4 h-4 opacity-80" />
+                    <span>Artist Studio</span>
+                  </>
+                ) : user.role === "admin" ? (
+                  <>
+                    <ShieldCheck className="w-4 h-4 opacity-80" />
+                    <span>Admin Panel</span>
+                  </>
+                ) : null}
               </Link>
             )}
           </div>
 
+          {/* Desktop Right Actions */}
           <div className="hidden items-center gap-3 md:flex">
             {user ? (
-              <>
-                <span className="text-sm text-slate-300">
-                  Hi, <span className="font-semibold text-white">{user.fullName}</span>
-                </span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-800/60 border border-white/10">
+                  <div className="w-6 h-6 rounded-full bg-amber-400/20 text-amber-300 flex items-center justify-center text-xs font-semibold">
+                    {user.fullName ? user.fullName[0].toUpperCase() : "U"}
+                  </div>
+                  <span className="text-sm font-medium text-zinc-200">
+                    {user.fullName || user.username}
+                  </span>
+                  <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-zinc-700/60 text-zinc-300 font-semibold">
+                    {user.role}
+                  </span>
+                </div>
+
                 <button
                   onClick={handleLogout}
-                  className="rounded-full border border-red-400/30 bg-red-500/15 px-4 py-2 text-sm font-medium text-red-200 transition hover:bg-red-500/25"
+                  title="Logout"
+                  className="flex items-center gap-1.5 rounded-full border border-red-500/20 bg-red-500/10 px-3.5 py-2 text-xs font-medium text-red-300 transition-all hover:bg-red-500/20 hover:border-red-500/40"
                 >
-                  Logout
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Logout</span>
                 </button>
-              </>
+              </div>
             ) : (
-              <>
+              <div className="flex items-center gap-2.5">
                 <Link
                   to="/signin"
-                  className="rounded-full px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10 hover:text-white"
+                  className="rounded-full px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:text-white hover:bg-white/10"
                 >
-                  Login
+                  Sign In
                 </Link>
                 <Link
                   to="/signup"
-                  className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+                  className="group relative inline-flex items-center justify-center rounded-full bg-white px-5 py-2 text-sm font-semibold text-zinc-950 transition-all duration-200 hover:bg-zinc-100 hover:shadow-lg active:scale-95"
                 >
-                  Sign Up
+                  <span>Join MuseMarket</span>
                 </Link>
-              </>
+              </div>
             )}
           </div>
 
+          {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/10 p-2.5 text-slate-100 transition hover:bg-white/20 md:hidden"
-            aria-expanded={isOpen}
+            className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-zinc-800/60 p-2.5 text-zinc-200 transition-colors hover:bg-zinc-700/60 md:hidden"
+            aria-label="Toggle navigation"
           >
-            <span className="sr-only">Open main menu</span>
-            <div className="relative flex h-5 w-5 flex-col items-center justify-center">
-              <span
-                className={`h-0.5 w-4 rounded-full bg-current transition-all duration-300 ${
-                  isOpen ? "translate-y-[5px] rotate-45" : ""
-                }`}
-              />
-              <span
-                className={`mt-1 h-0.5 w-4 rounded-full bg-current transition-all duration-300 ${
-                  isOpen ? "opacity-0" : ""
-                }`}
-              />
-              <span
-                className={`mt-1 h-0.5 w-4 rounded-full bg-current transition-all duration-300 ${
-                  isOpen ? "-translate-y-[5px] -rotate-45" : ""
-                }`}
-              />
-            </div>
+            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </nav>
 
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.97 }}
+            initial={{ opacity: 0, y: -10, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.97 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="absolute left-0 top-20 z-40 w-full overflow-hidden rounded-[1.25rem] border border-white/10 bg-slate-950/35 p-4 shadow-2xl backdrop-blur-2xl backdrop-saturate-150 md:hidden"
+            className="absolute left-0 top-full mt-2 w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0e1017]/95 p-4 shadow-2xl backdrop-blur-2xl md:hidden"
           >
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <Link
                 to="/"
                 onClick={() => setIsOpen(false)}
-                className={`block rounded-xl px-4 py-3 text-base font-medium transition-all ${
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                   isActive("/")
-                    ? "bg-white/10 text-white"
-                    : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    ? "bg-white text-zinc-950 font-semibold"
+                    : "text-zinc-300 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                Home
+                <HomeIcon className="w-4 h-4" />
+                <span>Gallery Home</span>
               </Link>
               <Link
                 to="/explore"
                 onClick={() => setIsOpen(false)}
-                className={`block rounded-xl px-4 py-3 text-base font-medium transition-all ${
+                className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                   isActive("/explore")
-                    ? "bg-white/10 text-white"
-                    : "text-slate-300 hover:bg-white/5 hover:text-white"
+                    ? "bg-white text-zinc-950 font-semibold"
+                    : "text-zinc-300 hover:bg-white/5 hover:text-white"
                 }`}
               >
-                Explore
+                <Compass className="w-4 h-4" />
+                <span>Explore Artworks</span>
               </Link>
+
               {user && (
                 <Link
-                  to={user.role === "seller" ? "/sellerdashboard" : user.role === "admin" ? "/admindashboard" : "/explore"}
+                  to={
+                    user.role === "seller"
+                      ? "/sellerdashboard"
+                      : user.role === "admin"
+                      ? "/admindashboard"
+                      : "/explore"
+                  }
                   onClick={() => setIsOpen(false)}
-                  className={`block rounded-xl px-4 py-3 text-base font-medium transition-all ${
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
                     isActive("/sellerdashboard") || isActive("/admindashboard")
-                      ? "bg-white/10 text-white"
-                      : "text-slate-300 hover:bg-white/5 hover:text-white"
+                      ? "bg-white text-zinc-950 font-semibold"
+                      : "text-zinc-300 hover:bg-white/5 hover:text-white"
                   }`}
                 >
-                  {user.role === "seller" ? "Seller Dashboard" : user.role === "admin" ? "Admin Dashboard" : ""}
+                  {user.role === "seller" ? (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      <span>Artist Studio</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>Admin Panel</span>
+                    </>
+                  )}
                 </Link>
               )}
 
               {user ? (
-                <div className="mt-4 border-t border-white/10 pt-4">
-                  <div className="mb-3 text-base font-medium text-white">
-                    Welcome, <span className="font-semibold text-fuchsia-400">{user.fullName}</span>
+                <div className="mt-3 border-t border-white/10 pt-3">
+                  <div className="flex items-center justify-between px-2 mb-3">
+                    <span className="text-xs text-zinc-400">Signed in as</span>
+                    <span className="text-xs font-semibold text-white">
+                      {user.fullName} ({user.role})
+                    </span>
                   </div>
                   <button
                     onClick={handleLogout}
-                    className="w-full rounded-xl bg-red-500/15 px-4 py-3 text-center text-base font-medium text-red-200 transition hover:bg-red-500/25"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500/15 py-2.5 text-sm font-medium text-red-300 transition hover:bg-red-500/25"
                   >
-                    Logout
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
                   </button>
                 </div>
               ) : (
-                <div className="mt-4 flex flex-col gap-2 border-t border-white/10 pt-4">
+                <div className="mt-3 flex flex-col gap-2 border-t border-white/10 pt-3">
                   <Link
                     to="/signin"
                     onClick={() => setIsOpen(false)}
-                    className="w-full rounded-xl border border-white/15 px-4 py-3 text-center text-base font-medium text-white transition hover:bg-white/5"
+                    className="w-full rounded-xl border border-white/15 py-2.5 text-center text-sm font-medium text-white transition hover:bg-white/5"
                   >
-                    Login
+                    Sign In
                   </Link>
                   <Link
                     to="/signup"
                     onClick={() => setIsOpen(false)}
-                    className="w-full rounded-xl bg-white px-4 py-3 text-center text-base font-semibold text-slate-900 transition hover:bg-slate-100"
+                    className="w-full rounded-xl bg-white py-2.5 text-center text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200"
                   >
-                    Sign Up
+                    Join MuseMarket
                   </Link>
                 </div>
               )}
@@ -231,7 +291,7 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </motion.header>
   );
 };
 

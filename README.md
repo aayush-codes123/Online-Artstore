@@ -45,7 +45,7 @@
 - **Framework**: [Express.js](https://expressjs.com/)
 - **Database**: [MongoDB](https://www.mongodb.com/) (with Mongoose ODM)
 - **Authentication**: JWT & Passport
-- **Image Hosting**: Cloudinary ( not yet)
+- **Image Hosting**: Cloudinary (persistent cloud hosting for Vercel & production)
 - **Payments**: Stripe API
 - **Email**: Nodemailer
 
@@ -56,7 +56,7 @@
 ### Prerequisites
 - Node.js installed on your machine.
 - MongoDB instance (local or Atlas).
-- Cloudinary Account.
+- Cloudinary Account (Cloud Name, API Key, API Secret).
 - Stripe Account.
 
 ### 1. Backend Setup
@@ -121,9 +121,18 @@
 - `POST /api/auth/login` - Login and receive JWT.
 
 ### Artworks
-- `GET /api/artworks` - Fetch all artworks.
-- `POST /api/artworks` - Upload new artwork (Seller only).
-- `DELETE /api/artworks/:id` - Delete artwork (Seller only).
+- `GET /api/artworks` - Fetch seller's artworks.
+- `GET /api/artworks/explore` - Fetch public approved artworks.
+- `POST /api/seller/artworks` or `POST /api/artworks` - Upload new artwork with image directly to Cloudinary (Seller only).
+- `PUT /api/artworks/:id` - Update artwork details / image (Seller only).
+- `DELETE /api/artworks/:id` - Delete artwork and remove asset from Cloudinary (Seller only).
+
+### Cloudinary & Uploads
+- `GET /api/cloudinary/config` (or `/api/cloudinary/status`) - Check if Cloudinary credentials are active.
+- `POST /api/cloudinary/upload` (or `/api/upload`) - Upload an image via `multipart/form-data` (`image` or `file` field). Returns CDN URL and public_id.
+- `POST /api/cloudinary/upload-url` - Upload image via base64 or remote URL (Auth required).
+- `GET /api/cloudinary/signature` - Get signed timestamp and signature for direct client-to-Cloudinary uploads (Auth required).
+- `DELETE /api/cloudinary/:public_id` - Delete image from Cloudinary by public ID (Auth required).
 
 ### Orders
 - `POST /api/orders` - Create a new order (Checkout).

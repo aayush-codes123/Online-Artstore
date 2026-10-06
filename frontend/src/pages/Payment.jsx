@@ -1,10 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { 
+  ShieldCheck, 
+  Lock, 
+  CreditCard, 
+  CheckCircle2, 
+  ArrowLeft, 
+  Sparkles, 
+  Truck, 
+  AlertCircle 
+} from "lucide-react";
+import Navbar from "../components/Navbar";
 
-// Load Stripe with your publishable key
+// Load Stripe publishable key
 const stripePromise = loadStripe("pk_test_51SXkxf7swrRHPTMyJ97vB1S3cMr4yqo2csZrFd573sUKXec8yJTj6L1G6OcZC82yPIHySwXYPK3ncVMXfDBUXqnw00Kgz2XGDg");
 
 const CheckoutForm = ({ artwork, formData, onSuccess }) => {
@@ -38,7 +49,12 @@ const CheckoutForm = ({ artwork, formData, onSuccess }) => {
         }),
       });
 
-      const { clientSecret } = await response.json();
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to initiate payment transaction.");
+      }
+
+      const { clientSecret } = data;
 
       // Confirm the payment with Stripe
       const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
@@ -53,8 +69,8 @@ const CheckoutForm = ({ artwork, formData, onSuccess }) => {
         return;
       }
 
-      if (paymentIntent.status === "succeeded") {
-        // Payment successful, now create the order
+      if (paymentIntent && paymentIntent.status === "succeeded") {
+        // Create the order in backend
         const orderRes = await fetch("/api/orders", {
           method: "POST",
           headers: {
@@ -75,33 +91,43 @@ const CheckoutForm = ({ artwork, formData, onSuccess }) => {
         if (orderRes.ok) {
           onSuccess();
         } else {
-          setError(orderData.message || "Order placement failed");
+          setError(orderData.message || "Payment processed, but order creation recorded an issue.");
         }
       }
     } catch (err) {
-      setError("Payment processing failed. Please try again.");
+      setError(err.message || "Payment processing failed. Please verify your details.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="bg-gray-700 p-4 rounded-lg">
-        <label className="block text-sm font-medium text-gray-400 mb-2">Card Details</label>
-        <div className="bg-white p-3 rounded">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {error && (
+        <div className="p-3.5 rounded-xl bg-red-950/60 border border-red-500/30 text-red-200 text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+
+      <div>
+        <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
+          Card Information (Stripe Secure)
+        </label>
+        <div className="p-4 rounded-xl bg-zinc-950/90 border border-white/10 text-white shadow-inner">
           <CardElement
             options={{
               style: {
                 base: {
-                  fontSize: '16px',
-                  color: '#424770',
-                  '::placeholder': {
-                    color: '#aab7c4',
+                  fontSize: "15px",
+                  color: "#ffffff",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  "::placeholder": {
+                    color: "#71717a",
                   },
                 },
                 invalid: {
-                  color: '#9e2146',
+                  color: "#f87171",
                 },
               },
             }}
@@ -109,17 +135,24 @@ const CheckoutForm = ({ artwork, formData, onSuccess }) => {
         </div>
       </div>
 
-      {error && <p className="text-red-400 text-sm">{error}</p>}
+      <div className="p-4 rounded-xl bg-zinc-950/60 border border-white/5 space-y-2 text-xs text-zinc-400">
+        <div className="flex items-center gap-2 text-emerald-400 font-medium">
+          <Lock className="w-4 h-4 shrink-0" />
+          <span>256-Bit Encrypted Escrow Transfer</span>
+        </div>
+        <p>
+          Funds remain protected in verified escrow until your artwork is authenticated and successfully delivered to your shipping address.
+        </p>
+      </div>
 
-      <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+      <button
         type="submit"
         disabled={!stripe || loading}
-        className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white font-bold py-3 rounded-xl shadow-lg transition"
+        className="w-full py-4 rounded-full bg-white text-zinc-950 font-bold text-sm transition hover:bg-zinc-200 active:scale-95 shadow-xl disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        {loading ? "Processing..." : `Pay Rs. ${artwork.price}`}
-      </motion.button>
+        <Lock className="w-4 h-4" />
+        <span>{loading ? "Processing Secure Transfer..." : `Authorize Rs. ${Number(artwork.price).toLocaleString()}`}</span>
+      </button>
     </form>
   );
 };
@@ -131,15 +164,20 @@ const Payment = () => {
 
   if (!state) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl">No order details found.</p>
-          <button
-            onClick={() => navigate("/explore")}
-            className="mt-4 px-6 py-2 bg-purple-600 rounded-lg hover:bg-purple-700"
+      <div className="min-h-screen bg-[#0b0c10] text-zinc-100 flex items-center justify-center p-6">
+        <div className="text-center max-w-md p-8 rounded-2xl bg-zinc-900 border border-white/10 space-y-4">
+          <CreditCard className="w-10 h-10 text-zinc-500 mx-auto" />
+          <h2 className="text-xl font-bold text-white font-serif-title">No Acquisition Order Found</h2>
+          <p className="text-xs text-zinc-400 leading-relaxed">
+            Please select an artwork from the gallery to begin the acquisition checkout.
+          </p>
+          <Link
+            to="/explore"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white text-zinc-950 text-xs font-bold hover:bg-zinc-200 transition"
           >
-            Go to Explore
-          </button>
+            <ArrowLeft className="w-4 h-4" />
+            <span>Return to Gallery</span>
+          </Link>
         </div>
       </div>
     );
@@ -153,39 +191,119 @@ const Payment = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-6">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-md w-full"
-      >
-        <h2 className="text-3xl font-bold mb-6 text-purple-400 text-center">Payment</h2>
+    <div className="min-h-screen bg-[#0b0c10] text-zinc-100 selection:bg-amber-400/20 selection:text-amber-200">
+      <Navbar />
 
-        <div className="mb-6 text-left bg-gray-700 p-4 rounded-lg">
-          <p className="text-gray-300">Total Amount:</p>
-          <p className="text-2xl font-bold text-white">Rs. {artwork.price}</p>
-          <div className="mt-2 border-t border-gray-600 pt-2">
-            <p className="text-sm text-gray-400">Artwork: {artwork.title}</p>
-            <p className="text-sm text-gray-400">Shipping to: {formData.address}</p>
+      <main className="pt-32 pb-24 px-6 sm:px-8 lg:px-12 max-w-6xl mx-auto">
+        {/* Step Indicator */}
+        <div className="mb-10 max-w-xl mx-auto">
+          <div className="flex items-center justify-between text-xs font-semibold">
+            <div className="flex items-center gap-2 text-emerald-400">
+              <CheckCircle2 className="w-5 h-5 shrink-0" />
+              <span>Collector & Delivery</span>
+            </div>
+            <div className="h-[1px] flex-1 mx-4 bg-emerald-500/40" />
+            <div className="flex items-center gap-2 text-white">
+              <span className="w-6 h-6 rounded-full bg-white text-zinc-950 flex items-center justify-center text-xs font-bold">2</span>
+              <span>Payment & Escrow</span>
+            </div>
           </div>
         </div>
 
-        {success ? (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-green-600/20 text-green-300 p-6 rounded-lg text-center"
-          >
-            <h3 className="text-xl font-bold mb-2">Payment Successful!</h3>
-            <p>Order confirmed. Check your email for details.</p>
-            <p className="text-sm mt-2">Redirecting to explore...</p>
-          </motion.div>
-        ) : (
-          <Elements stripe={stripePromise}>
-            <CheckoutForm artwork={artwork} formData={formData} onSuccess={handleSuccess} />
-          </Elements>
-        )}
-      </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
+        >
+          {/* Left Column: Acquisition Recap */}
+          <div className="lg:col-span-5 rounded-3xl overflow-hidden border border-white/10 bg-zinc-900/60 backdrop-blur-md p-6 space-y-6">
+            <div className="flex items-center gap-4">
+              <img
+                src={artwork.imageUrl}
+                alt={artwork.title}
+                className="w-20 h-20 rounded-xl object-cover border border-white/10 bg-black"
+              />
+              <div>
+                <span className="text-[11px] text-amber-300 font-semibold uppercase tracking-wider">
+                  Original Artwork
+                </span>
+                <h3 className="text-lg font-bold text-white font-serif-title line-clamp-1">
+                  {artwork.title}
+                </h3>
+                <p className="text-xs text-zinc-400">
+                  {artwork.sellerName || artwork.seller?.fullName || "Verified Creator"}
+                </p>
+              </div>
+            </div>
+
+            {/* Delivery address confirmation */}
+            <div className="p-4 rounded-xl bg-zinc-950/60 border border-white/5 space-y-1.5 text-xs">
+              <div className="flex items-center gap-1.5 text-zinc-300 font-semibold mb-1">
+                <Truck className="w-3.5 h-3.5 text-amber-300" />
+                <span>Courier Destination</span>
+              </div>
+              <p className="text-white font-medium">{formData.fullName}</p>
+              <p className="text-zinc-400">{formData.address}</p>
+              <p className="text-zinc-400">Contact: {formData.contactNumber}</p>
+            </div>
+
+            {/* Total recap */}
+            <div className="pt-4 border-t border-white/10 space-y-2 text-xs">
+              <div className="flex justify-between text-zinc-400">
+                <span>Subtotal</span>
+                <span className="text-zinc-200">Rs. {Number(artwork.price).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-zinc-400">
+                <span>Archival Handling & Transit</span>
+                <span className="text-emerald-400">Complimentary</span>
+              </div>
+              <div className="flex justify-between text-base font-bold text-white pt-2 border-t border-white/10">
+                <span>Total Authorized</span>
+                <span>Rs. {Number(artwork.price).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Stripe Checkout or Success */}
+          <div className="lg:col-span-7 rounded-3xl border border-white/10 bg-zinc-900/60 backdrop-blur-md p-8 space-y-6">
+            <div>
+              <span className="text-amber-300 text-xs font-bold uppercase tracking-[0.2em]">Step 2 of 2</span>
+              <h3 className="text-2xl font-bold text-white font-serif-title mt-1">
+                Complete Payment
+              </h3>
+              <p className="text-xs text-zinc-400 mt-1">
+                Enter your card details below to finalize acquisition and initiate courier dispatch.
+              </p>
+            </div>
+
+            {success ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="p-8 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 text-center space-y-4"
+              >
+                <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-white font-serif-title">
+                  Acquisition Confirmed!
+                </h3>
+                <p className="text-xs text-emerald-200 max-w-md mx-auto leading-relaxed">
+                  Your payment has cleared into secure escrow. The artist has been notified to seal and dispatch your certificate and artwork.
+                </p>
+                <p className="text-[11px] text-zinc-400 pt-2">
+                  Redirecting back to gallery archive...
+                </p>
+              </motion.div>
+            ) : (
+              <Elements stripe={stripePromise}>
+                <CheckoutForm artwork={artwork} formData={formData} onSuccess={handleSuccess} />
+              </Elements>
+            )}
+          </div>
+        </motion.div>
+      </main>
     </div>
   );
 };

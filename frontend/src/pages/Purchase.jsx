@@ -1,6 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { 
+  ShieldCheck, 
+  Truck, 
+  Lock, 
+  ArrowRight, 
+  ArrowLeft, 
+  User, 
+  MapPin, 
+  Phone, 
+  Sparkles, 
+  CheckCircle2, 
+  Award, 
+  Palette 
+} from "lucide-react";
+import Navbar from "../components/Navbar";
+import { CURATED_ARTWORKS } from "../data/artData";
 
 const Purchase = () => {
   const { artworkId } = useParams();
@@ -13,7 +29,6 @@ const Purchase = () => {
     contactNumber: "",
   });
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,22 +40,42 @@ const Purchase = () => {
         }
 
         // Fetch Artwork Details
-        const artRes = await fetch(`/api/artworks/${artworkId}`);
-        if (!artRes.ok) throw new Error("Failed to load artwork");
-        const artData = await artRes.json();
-        setArtwork(artData);
+        let foundArt = null;
+        try {
+          const artRes = await fetch(`/api/artworks/${artworkId}`);
+          if (artRes.ok) {
+            foundArt = await artRes.json();
+          }
+        } catch (e) {
+          console.warn("Backend artwork fetch error, checking curated fallback:", e);
+        }
 
-        // Fetch User Profile for Pre-filling
-        const userRes = await fetch("/api/auth/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          setFormData({
-            fullName: userData.fullName || "",
-            address: userData.address || "",
-            contactNumber: userData.phoneNumber || "",
+        if (!foundArt) {
+          // Check curated artworks fallback
+          foundArt = CURATED_ARTWORKS.find((a) => a._id === artworkId);
+        }
+
+        if (!foundArt) {
+          throw new Error("Artwork could not be located in exhibition archive.");
+        }
+
+        setArtwork(foundArt);
+
+        // Pre-fill user profile info if logged in
+        try {
+          const userRes = await fetch("/api/auth/profile", {
+            headers: { Authorization: `Bearer ${token}` },
           });
+          if (userRes.ok) {
+            const userData = await userRes.json();
+            setFormData({
+              fullName: userData.fullName || "",
+              address: userData.address || "",
+              contactNumber: userData.phoneNumber || "",
+            });
+          }
+        } catch (e) {
+          console.warn("User profile fetch failed:", e);
         }
       } catch (err) {
         setError(err.message);
@@ -58,112 +93,237 @@ const Purchase = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Navigate to Payment page with details
     navigate("/payment", {
       state: {
         artwork,
-        formData
-      }
+        formData,
+      },
     });
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-white">Loading...</div>;
-  if (!artwork) return <div className="min-h-screen flex items-center justify-center text-red-500">Artwork not found</div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0b0c10] text-zinc-100 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-2 border-white/20 border-t-amber-300 rounded-full animate-spin mx-auto" />
+          <p className="text-xs text-zinc-400 uppercase tracking-widest font-mono">Loading Acquisition Archive...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !artwork) {
+    return (
+      <div className="min-h-screen bg-[#0b0c10] text-zinc-100 flex items-center justify-center p-6">
+        <div className="text-center max-w-md p-8 rounded-2xl bg-zinc-900 border border-white/10 space-y-4">
+          <Palette className="w-10 h-10 text-zinc-500 mx-auto" />
+          <h2 className="text-xl font-bold text-white font-serif-title">Artwork Unavailable</h2>
+          <p className="text-xs text-zinc-400 leading-relaxed">{error || "This artwork is not currently in the collection."}</p>
+          <Link
+            to="/explore"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white text-zinc-950 text-xs font-bold hover:bg-zinc-200 transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Return to Gallery</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden flex flex-col md:flex-row"
-      >
-        {/* Artwork Preview Section */}
-        <div className="md:w-1/2 relative h-64 md:h-auto">
-          <img
-            src={artwork.imageUrl}
-            alt={artwork.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 to-transparent p-6">
-            <h2 className="text-3xl font-bold">{artwork.title}</h2>
-            <p className="text-gray-300 mt-2 line-clamp-2">{artwork.description}</p>
+    <div className="min-h-screen bg-[#0b0c10] text-zinc-100 selection:bg-amber-400/20 selection:text-amber-200">
+      <Navbar />
 
-            {/* Artwork Details */}
-            {artwork.details && (
-              <div className="mt-3 text-sm text-gray-300 space-y-1">
-                {artwork.details.paperQuality && <p><span className="text-gray-400">Paper:</span> {artwork.details.paperQuality}</p>}
-                {artwork.details.brushType && <p><span className="text-gray-400">Brush:</span> {artwork.details.brushType}</p>}
-                {artwork.details.strokeCount && <p><span className="text-gray-400">Details:</span> {artwork.details.strokeCount}</p>}
-              </div>
-            )}
-
-            <p className="text-2xl font-semibold text-purple-400 mt-4">Rs. {artwork.price}</p>
+      <main className="pt-32 pb-24 px-6 sm:px-8 lg:px-12 max-w-6xl mx-auto">
+        {/* Step Indicator */}
+        <div className="mb-10 max-w-xl mx-auto">
+          <div className="flex items-center justify-between text-xs font-semibold">
+            <div className="flex items-center gap-2 text-white">
+              <span className="w-6 h-6 rounded-full bg-white text-zinc-950 flex items-center justify-center text-xs font-bold">1</span>
+              <span>Collector & Delivery</span>
+            </div>
+            <div className="h-[1px] flex-1 mx-4 bg-white/20" />
+            <div className="flex items-center gap-2 text-zinc-500">
+              <span className="w-6 h-6 rounded-full bg-zinc-800 text-zinc-400 border border-white/10 flex items-center justify-center text-xs font-bold">2</span>
+              <span>Payment & Escrow</span>
+            </div>
           </div>
         </div>
 
-        {/* Purchase Form Section */}
-        <div className="md:w-1/2 p-8 flex flex-col justify-center">
-          <h2 className="text-2xl font-bold mb-6 text-purple-300">Complete Your Purchase</h2>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-purple-500 outline-none transition"
-                placeholder="Enter your full name"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
+        >
+          {/* Left Column: Artwork Showcase & Acquisition Summary */}
+          <div className="lg:col-span-5 rounded-3xl overflow-hidden border border-white/10 bg-zinc-900/60 backdrop-blur-md p-6 space-y-6">
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-black border border-white/5">
+              <img
+                src={artwork.imageUrl}
+                alt={artwork.title}
+                className="w-full h-full object-cover"
               />
+              <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-amber-300">
+                Original Artwork
+              </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Shipping Address</label>
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-purple-500 outline-none transition"
-                placeholder="Enter delivery address"
-              />
+              <div className="text-xs text-zinc-400 mb-1">
+                Artist: <span className="text-zinc-200 font-semibold">{artwork.sellerName || artwork.seller?.fullName || "Verified Creator"}</span>
+              </div>
+              <h2 className="text-2xl font-bold text-white font-serif-title">
+                {artwork.title}
+              </h2>
+              <p className="text-xs text-zinc-400 mt-2 line-clamp-3 leading-relaxed">
+                {artwork.description}
+              </p>
             </div>
 
+            {/* Specifications */}
+            {artwork.details && (
+              <div className="p-4 rounded-xl bg-zinc-950/60 border border-white/5 space-y-2 text-xs">
+                {artwork.details.paperQuality && (
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Medium / Surface:</span>
+                    <span className="text-zinc-200 font-medium">{artwork.details.paperQuality}</span>
+                  </div>
+                )}
+                {artwork.details.brushType && (
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Technique:</span>
+                    <span className="text-zinc-200 font-medium">{artwork.details.brushType}</span>
+                  </div>
+                )}
+                {artwork.details.strokeCount && (
+                  <div className="flex justify-between">
+                    <span className="text-zinc-400">Execution:</span>
+                    <span className="text-zinc-200 font-medium">{artwork.details.strokeCount}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Pricing Breakdown */}
+            <div className="pt-4 border-t border-white/10 space-y-2.5 text-xs">
+              <div className="flex justify-between text-zinc-400">
+                <span>Artwork Price</span>
+                <span className="text-zinc-200 font-semibold">Rs. {Number(artwork.price).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-zinc-400">
+                <span>Museum-Grade Insured Shipping</span>
+                <span className="text-emerald-400 font-medium">Complimentary</span>
+              </div>
+              <div className="flex justify-between text-zinc-400">
+                <span>Certificate of Authenticity</span>
+                <span className="text-emerald-400 font-medium">Included</span>
+              </div>
+              <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-white/10">
+                <span>Total Acquisition Amount</span>
+                <span>Rs. {Number(artwork.price).toLocaleString()}</span>
+              </div>
+            </div>
+
+            {/* Guarantees */}
+            <div className="space-y-2 pt-2 text-[11px] text-zinc-400">
+              <div className="flex items-center gap-2 text-emerald-400">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>100% Verified Authenticity Guarantee</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 shrink-0 text-amber-300" />
+                <span>14-day collector satisfaction inspection period</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Collector Delivery Form */}
+          <div className="lg:col-span-7 rounded-3xl border border-white/10 bg-zinc-900/60 backdrop-blur-md p-8 space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Contact Number</label>
-              <input
-                type="tel"
-                name="contactNumber"
-                value={formData.contactNumber}
-                onChange={handleChange}
-                required
-                className="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:ring-2 focus:ring-purple-500 outline-none transition"
-                placeholder="Enter phone number"
-              />
+              <span className="text-amber-300 text-xs font-bold uppercase tracking-[0.2em]">Step 1 of 2</span>
+              <h3 className="text-2xl font-bold text-white font-serif-title mt-1">
+                Collector Shipping Information
+              </h3>
+              <p className="text-xs text-zinc-400 mt-1">
+                Please enter the exact destination for climate-safe archival courier delivery.
+              </p>
             </div>
 
-            <div className="pt-4">
-              <div className="flex justify-between items-center mb-4 text-sm text-gray-400">
-                <span>Next Step</span>
-                <span className="text-purple-400 font-semibold">Payment</span>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">
+                  Collector Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    required
+                    placeholder="e.g. Eleanor Vance"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-white/30 transition-all"
+                  />
+                </div>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">
+                  Archival Delivery Address
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                  <input
+                    type="text"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    required
+                    placeholder="Street address, apartment/suite, city, postal code"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-white/30 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">
+                  Courier Contact Number
+                </label>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                  <input
+                    type="tel"
+                    name="contactNumber"
+                    value={formData.contactNumber}
+                    onChange={handleChange}
+                    required
+                    placeholder="Direct contact for delivery confirmation"
+                    className="w-full pl-11 pr-4 py-3 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-white/30 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-zinc-950/70 border border-white/5 flex items-start gap-3 text-xs text-zinc-400">
+                <Truck className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
+                <p>
+                  Artwork is packaged with acid-free glassine, corner reinforcements, and sealed in an archival crate. Fully insured during transit.
+                </p>
+              </div>
+
+              <button
                 type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl shadow-lg transition duration-300"
+                className="w-full py-4 rounded-full bg-white text-zinc-950 font-bold text-sm transition hover:bg-zinc-200 active:scale-95 shadow-xl flex items-center justify-center gap-2 group"
               >
-                Proceed to Payment
-              </motion.button>
-            </div>
-          </form>
-        </div>
-      </motion.div>
+                <span>Proceed to Secure Payment</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            </form>
+          </div>
+        </motion.div>
+      </main>
     </div>
   );
 };

@@ -1,193 +1,230 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import background from "../images/background.jpg";
+import { 
+  Palette, 
+  ArrowLeft, 
+  Lock, 
+  User, 
+  Eye, 
+  EyeOff, 
+  Sparkles, 
+  AlertCircle,
+  ArrowRight,
+  ShieldCheck
+} from "lucide-react";
 
 export const SignIn = () => {
-  const [isSeller, setIsSeller] = useState(true);
+  const [isSeller, setIsSeller] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // for cookies if using sessions
+        credentials: "include",
         body: JSON.stringify({ username, password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        localStorage.setItem("token", data.token); // Optional: store JWT
-        if (data.user.role === "seller") {
+        localStorage.setItem("token", data.token);
+        if (data.user?.role === "seller") {
           navigate("/sellerdashboard");
-        } else if (data.user.role === "admin") {
+        } else if (data.user?.role === "admin") {
           navigate("/admindashboard");
         } else {
           navigate("/explore");
         }
       } else {
-        setError(data.message || "Login failed");
+        setError(data.message || "Invalid credentials. Please verify and try again.");
       }
     } catch (err) {
-      setError("Server error. Please try again.");
+      setError("Unable to connect to service. Please try again shortly.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center relative overflow-hidden"
-      style={{ backgroundImage: `url(${background})` }}
-    >
-      {/* Background glow */}
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-pink-500/20 to-indigo-600/30"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.4 }}
-        transition={{ duration: 2 }}
-      />
-<div className="absolute top-0 left-0 w-full bg-black/40 backdrop-blur-sm z-50">
-  <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-    <a
-      href="/"
-      className="text-white text-2xl font-bold hover:text-purple-300 transition"
-    >
-      🎨 Musemarket
-    </a>
-    <a
-      href="/"
-      className="text-white font-medium hover:text-purple-300 transition"
-    >
-      Home
-    </a>
-  </div>
-  </div>
-        {/* Toggle Buttons */}
-        <motion.div
-          className="flex gap-6 mb-8 z-10"
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
-          <button
-            onClick={() => setIsSeller(true)}
-            className={`text-xl font-semibold px-6 py-3 rounded-full backdrop-blur-lg transition duration-300 ${
-              isSeller
-                ? "text-white bg-purple-700 shadow-xl"
-                : "text-gray-200 hover:text-white hover:bg-purple-500/30"
-            }`}
-          >
-            For Seller
-          </button>
-          <button
-            onClick={() => setIsSeller(false)}
-            className={`text-xl font-semibold px-6 py-3 rounded-full backdrop-blur-lg transition duration-300 ${
-              !isSeller
-                ? "text-white bg-purple-700 shadow-xl"
-                : "text-gray-200 hover:text-white hover:bg-purple-500/30"
-            }`}
-          >
-            For Buyer
-          </button>
-        </motion.div>
+    <div className="min-h-screen bg-[#0b0c10] text-zinc-100 flex flex-col lg:flex-row">
+      {/* Left Column: Fine Art Editorial Visual Showcase (Desktop) */}
+      <div className="relative hidden lg:flex lg:w-1/2 min-h-screen overflow-hidden bg-zinc-950 items-end p-12">
+        <img
+          src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=1400&auto=format&fit=crop"
+          alt="MuseMarket Gallery Artwork"
+          className="absolute inset-0 w-full h-full object-cover filter brightness-[0.7] contrast-105"
+        />
+        {/* Deep elegant vignette (No tacky linear color gradients) */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0b0c10] via-black/40 to-black/20" />
 
-        {/* Login Form */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={isSeller ? "seller" : "buyer"}
-            initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -40, scale: 0.95 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="bg-white/10 backdrop-blur-xl p-6 md:p-10 rounded-3xl border border-white/30 shadow-2xl w-full max-w-md z-10"
+        <div className="relative z-10 space-y-4 max-w-lg">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-amber-300 text-xs font-semibold uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Autumn Salon Archive</span>
+          </div>
+
+          <blockquote className="text-2xl font-medium text-white font-serif-title leading-snug">
+            "Art enables us to find ourselves and lose ourselves at the same time."
+          </blockquote>
+          
+          <div className="flex items-center gap-3 pt-2 text-xs text-zinc-300">
+            <span className="font-semibold text-white">Thomas Merton</span>
+            <span>•</span>
+            <span>Permanent Archive Collection</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Column: Authentication Form */}
+      <div className="flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-16 max-w-xl mx-auto w-full">
+        {/* Top Header */}
+        <div className="flex items-center justify-between mb-8">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-zinc-400 hover:text-white transition"
           >
-            <motion.h2
-              className="text-white text-3xl font-extrabold text-center mb-6"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Gallery</span>
+          </Link>
+
+          <Link to="/" className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 border border-white/15 text-amber-300">
+              <Palette className="w-4 h-4" />
+            </span>
+            <span className="text-sm font-bold tracking-widest text-white font-serif-title">
+              MUSEMARKET
+            </span>
+          </Link>
+        </div>
+
+        {/* Center Content */}
+        <div className="my-auto space-y-8">
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white font-serif-title">
+              Welcome Back
+            </h2>
+            <p className="text-sm text-zinc-400 mt-2">
+              Sign in to manage your collection or access your artist studio.
+            </p>
+          </div>
+
+          {/* Account Type Toggle */}
+          <div className="grid grid-cols-2 p-1 rounded-2xl bg-zinc-900 border border-white/10 text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => setIsSeller(false)}
+              className={`py-3 rounded-xl transition-all duration-200 ${
+                !isSeller
+                  ? "bg-white text-zinc-950 shadow-md font-bold"
+                  : "text-zinc-400 hover:text-white"
+              }`}
             >
-              {isSeller ? "Seller Sign In" : "Buyer Sign In"}
-            </motion.h2>
+              Collector / Buyer
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSeller(true)}
+              className={`py-3 rounded-xl transition-all duration-200 ${
+                isSeller
+                  ? "bg-white text-zinc-950 shadow-md font-bold"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              Artist / Seller
+            </button>
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3.5 rounded-xl bg-red-950/60 border border-red-500/30 text-red-200 text-xs flex items-center gap-2"
               >
-                <label className="block text-lg font-medium text-white/80 mb-1">
-                  Username
-                </label>
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
+                <span>{error}</span>
+              </motion.div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">
+                Username
+              </label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white/40 transition"
                   placeholder="Enter your username"
                   required
+                  className="w-full pl-11 pr-4 py-3 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/30 transition-all"
                 />
-              </motion.div>
+              </div>
+            </div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-              >
-                <label className="block text-lg font-medium text-white/80 mb-1">
-                  Password
-                </label>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white/40 transition"
                   placeholder="Enter your password"
                   required
+                  className="w-full pl-11 pr-11 py-3 rounded-xl bg-zinc-900/80 border border-white/10 text-white placeholder-zinc-500 text-sm focus:outline-none focus:border-white/30 focus:ring-1 focus:ring-white/30 transition-all"
                 />
-              </motion.div>
-
-              {error && (
-                <motion.p
-                  className="text-red-300 text-center"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition"
                 >
-                  {error}
-                </motion.p>
-              )}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
 
-              <motion.button
-                type="submit"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
-                className="w-full bg-white/20 text-white py-3 rounded-xl hover:bg-purple-600/40 transition shadow-md mt-2"
-              >
-                Sign In
-              </motion.button>
-            </form>
-
-            <motion.p
-              className="text-white/70 text-center mt-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full mt-2 py-3.5 rounded-full bg-white text-zinc-950 font-bold text-sm transition hover:bg-zinc-200 active:scale-95 shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              Don’t have an account?{" "}
-              <a href="/signup" className="underline hover:text-white">
-                Sign up
-              </a>
-            </motion.p>
-          </motion.div>
-        </AnimatePresence>
+              <span>{loading ? "Authenticating..." : `Sign In as ${isSeller ? "Artist" : "Collector"}`}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </form>
+
+          <div className="pt-2 text-center text-xs text-zinc-400">
+            <span>New to MuseMarket? </span>
+            <Link to="/signup" className="font-semibold text-white hover:underline">
+              Create an account
+            </Link>
+          </div>
+        </div>
+
+        {/* Footer Guarantee */}
+        <div className="mt-8 pt-6 border-t border-white/5 flex items-center justify-center gap-2 text-xs text-zinc-500">
+          <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <span>Encrypted authentication & verified archive protection</span>
+        </div>
       </div>
+    </div>
   );
 };
 

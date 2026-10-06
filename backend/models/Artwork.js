@@ -14,6 +14,7 @@ const artworkSchema = new mongoose.Schema({
     strokeCount: String
   },
   imageUrl: { type: String, required: true },
+  cloudinaryPublicId: { type: String },
   seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
 }, {
   timestamps: true,

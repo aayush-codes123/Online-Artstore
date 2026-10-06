@@ -32,7 +32,7 @@ router.get('/', auth, getMyArtworks);
 router.delete('/:id', auth, deleteArtwork);
 
 // PUT update artwork by ID
-router.put('/:id', auth, updateArtwork);
+router.put('/:id', auth, upload.single('image'), updateArtwork);
 
 // GET by ID (Generic parameter route - Must be last)
 router.get('/:id', artworkController.getArtworkById);
